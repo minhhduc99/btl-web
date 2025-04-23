@@ -1,5 +1,4 @@
-import dao.ClassroomDAO;
-import dao.StudentDAO;
+import dao.ClassDAO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -40,24 +39,24 @@ public class AssignStudentToClass extends HttpServlet {
 		// TODO Auto-generated method stub
 		// doGet(request, response);
 	  String[] selectedStudentIds = request.getParameterValues("selectedStudents");
-      String classroomIdStr = request.getParameter("classroomId");
+      String classIdStr = request.getParameter("classId");
 
-      if (selectedStudentIds == null || classroomIdStr == null) {
+      if (selectedStudentIds == null || classIdStr == null) {
           request.setAttribute("error", "Missing parameters.");
-          response.sendRedirect("classroom.jsp?status=failed");
+          response.sendRedirect("classes.jsp?status=failed");
           return;
       }
 
       try {
-          int classroomId = Integer.parseInt(classroomIdStr);
+          int classId = Integer.parseInt(classIdStr);
           List<String> studentIds = Arrays.asList(selectedStudentIds);
 
-          ClassroomDAO.assignStudentsToClassroom(studentIds, classroomId);
+          ClassDAO.assignStudentsToClass(studentIds, classId);
 
-          response.sendRedirect(request.getContextPath() + "/ViewClassroom?id=" + classroomId);
+          response.sendRedirect(request.getContextPath() + "/ViewClass?id=" + classId);
       } catch (Exception e) {
           e.printStackTrace();
-          response.sendRedirect("classroom.jsp?status=failed");
+          response.sendRedirect("classes.jsp?status=failed");
       }
 	}
 

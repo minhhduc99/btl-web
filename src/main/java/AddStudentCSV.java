@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * Servlet implementation class AddStudentCSV
@@ -46,42 +47,57 @@ public class AddStudentCSV extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 	  Connection con = null;
-	  PreparedStatement pst = null;
-	  String sql = "INSERT INTO students (student_id, full_name, email) VALUES (?, ?, ?)";
+      PreparedStatement insertPst = null;
+      PreparedStatement checkPst = null;
+      String insertSQL = "INSERT INTO students (student_id, full_name, email) VALUES (?, ?, ?)";
+      String checkSQL = "SELECT * FROM students WHERE student_id = ? OR email = ?";
 
-	  try {
-	      Class.forName("com.mysql.cj.jdbc.Driver");
-	      con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_student_management", "dbadmin", "Abc@13579");
-	      pst = con.prepareStatement(sql);
+      try {
+          Class.forName("com.mysql.cj.jdbc.Driver");
+          con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_student_management", "dbadmin", "Abc@13579");
 
-	      Part filePart = request.getPart("csv_file");
-	      InputStream inputStream = filePart.getInputStream();
-	      BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-	      String line;
+          insertPst = con.prepareStatement(insertSQL);
+          checkPst = con.prepareStatement(checkSQL);
 
-	      while ((line = reader.readLine()) != null) {
-	          String[] parts = line.split(",");
-	          if (parts.length == 3) {
-	              String studentID = parts[0].trim();
-	              String fullName = parts[1].trim();
-	              String email = parts[2].trim();
+          Part filePart = request.getPart("csv_file");
+          InputStream inputStream = filePart.getInputStream();
+          BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+          String line;
 
-	              pst.setString(1, studentID);
-	              pst.setString(2, fullName);
-	              pst.setString(3, email);
-	              pst.executeUpdate();
-	          }
-	      }
+          while ((line = reader.readLine()) != null) {
+              String[] parts = line.split(",");
+              if (parts.length == 3) {
+                  String studentID = parts[0].trim();
+                  String fullName = parts[1].trim();
+                  String email = parts[2].trim();
 
-	      reader.close();
-	      pst.close();
-	      con.close();
+                  // Check whether student_id or email already exists
+                  checkPst.setString(1, studentID);
+                  checkPst.setString(2, email);
+                  ResultSet rs = checkPst.executeQuery();
 
-	  } catch (Exception e) {
-	      e.printStackTrace();
-	  }
+                  if (!rs.next()) { 
+                    // If not duplicate, insert this student
+                      insertPst.setString(1, studentID);
+                      insertPst.setString(2, fullName);
+                      insertPst.setString(3, email);
+                      insertPst.executeUpdate();
+                  }
 
-	  response.sendRedirect("Student");
+                  rs.close();
+              }
+          }
+
+          reader.close();
+          insertPst.close();
+          checkPst.close();
+          con.close();
+
+      } catch (Exception e) {
+          e.printStackTrace();
+      }
+
+      response.sendRedirect("Student");
 	}
 
 }

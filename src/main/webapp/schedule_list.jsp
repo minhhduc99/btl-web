@@ -9,7 +9,7 @@
 
   List<Schedule> scheduleList = (List<Schedule>) request.getAttribute("scheduleList");
   List<Course> courseList = CourseDAO.getAllCourses();
-  List<Classroom> classroomList = ClassroomDAO.getAllClassrooms();
+  List<Classes> classList = ClassDAO.getAllClasses();
 %>
 
 <%! 
@@ -76,8 +76,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">
@@ -146,7 +146,7 @@
 	          <tr>
 	            <td><input type="checkbox" class="scheduleCheckbox" name="scheduleIds" value="<%= sc.getId() %>"></td>
 	            <td><%= index++ %></td>
-	            <td><%= ClassroomDAO.getClassroomNameById(sc.getClassId()) %></td>
+	            <td><%= ClassDAO.getClassNameById(sc.getClassId()) %></td>
 	            <td><%= CourseDAO.getCourseNameById(sc.getCourseId()) %></td>
 	            <td><%= sc.getTeacherName() %></td>
 	            <td><%= sc.getRoom() %></td>
@@ -158,7 +158,7 @@
 					  onclick="openEditModal(
 					  	'<%= sc.getId() %>', 
 					  	'<%= sc.getClassId() %>',
-					  	'<%= ClassroomDAO.getClassroomNameById(sc.getClassId()) %>',  
+					  	'<%= ClassDAO.getClassNameById(sc.getClassId()) %>',  
 					  	'<%= sc.getCourseId() %>', 
 					  	'<%= CourseDAO.getCourseNameById(sc.getCourseId()) %>', 
 					  	'<%= sc.getTeacherName() %>', 
@@ -194,8 +194,8 @@
             <select class="form-select" id="classId" name="classId" required>
               <option value="">Select Class</option>
               <% 
-                if (classroomList != null) {
-                  for (Classroom c : classroomList) {
+                if (classList != null) {
+                  for (Classes c : classList) {
               %>
                   <option value="<%= c.getID() %>"><%= c.getClassName() %></option>
               <% 

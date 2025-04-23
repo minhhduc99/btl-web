@@ -58,8 +58,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">
@@ -100,6 +100,26 @@
 	    </button>
 	  </div>
 	</div>
+
+	<% String errorMessage = request.getParameter("add_error"); %>
+	<% if (errorMessage != null) { 
+	  	if (errorMessage.equals("info_already_exists")) {
+	%>
+	    <div style="color: red;">Course already exists.</div>
+	<% } } %>
+
+	<%
+	    String error = request.getParameter("error");
+	    if (error != null) {
+	        if (error.equals("course_in_use")) {
+	%>
+	            <div style="color: red; margin-bottom: 10px;">
+	                Can not delete this course because it is currently scheduled.
+	            </div>
+	<%
+	        }
+	    }
+	%>
 
     <% if (courseList != null && !courseList.isEmpty()) { %>
       <form id="deleteForm" action="DeleteCourse" method="post">

@@ -1,15 +1,15 @@
 package model;
 
-public class Classroom {
+public class Classes {
   private int id;
   private String class_name;
   private String class_period;
   private String teacher_name;
 
   // Getters and Setters
-  public Classroom() {}
+  public Classes() {}
 
-  public Classroom(String class_name, String class_period, String teacher_name) {
+  public Classes(String class_name, String class_period, String teacher_name) {
       this.class_name = class_name;
       this.class_period = class_period;
       this.teacher_name = teacher_name;

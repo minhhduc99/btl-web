@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import dao.ClassroomDAO;
+import dao.ClassDAO;
 
 /**
  * Servlet implementation class RemoveStudentFromClass
@@ -39,7 +39,7 @@ public class RemoveStudentFromClass extends HttpServlet {
 		// TODO Auto-generated method stub
 		// doGet(request, response);
 	    String[] studentIds = request.getParameterValues("studentIds");
-	    int classroomId = Integer.parseInt(request.getParameter("classroomId"));
+	    int classId = Integer.parseInt(request.getParameter("classId"));
 
 	    boolean success = false;
       
@@ -48,7 +48,7 @@ public class RemoveStudentFromClass extends HttpServlet {
 	            int studentId = Integer.parseInt(idStr);
 	            boolean removed = false;
               try {
-                removed = ClassroomDAO.removeStudentFromClass(classroomId, studentId);
+                removed = ClassDAO.removeStudentFromClass(classId, studentId);
               } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -67,7 +67,7 @@ public class RemoveStudentFromClass extends HttpServlet {
 	        request.setAttribute("error", "Failed to remove student(s)");
 	    }
 
-	    response.sendRedirect("ViewClassroom?id=" + classroomId);
+	    response.sendRedirect("ViewClass?id=" + classId);
 	}
 
 }

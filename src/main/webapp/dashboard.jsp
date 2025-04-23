@@ -51,8 +51,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">

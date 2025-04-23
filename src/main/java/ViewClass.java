@@ -5,26 +5,26 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.Classroom;
+import model.Classes;
 import model.User;
 
 import java.io.IOException;
 import java.util.List;
 
-import dao.ClassroomDAO;
+import dao.ClassDAO;
 import dao.StudentDAO;
 
 /**
- * Servlet implementation class ViewClassroom
+ * Servlet implementation class ViewClass
  */
-@WebServlet("/ViewClassroom")
-public class ViewClassroom extends HttpServlet {
+@WebServlet("/ViewClass")
+public class ViewClass extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public ViewClassroom() {
+    public ViewClass() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -38,26 +38,26 @@ public class ViewClassroom extends HttpServlet {
 	  String idStr = request.getParameter("id");
       if (idStr != null) {
           int classId = Integer.parseInt(idStr);
-          Classroom classroom = null;
+          Classes cls = null;
           try {
-            classroom = ClassroomDAO.getClassroomById(classId);
+            cls = ClassDAO.getClassById(classId);
           } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
           }
           List<User> studentList = null;
           try {
-            studentList = StudentDAO.getStudentsByClassroomId(classId);
+            studentList = StudentDAO.getStudentsByClassId(classId);
           } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
           }
 
-          request.setAttribute("classroom", classroom);
+          request.setAttribute("class", cls);
           request.setAttribute("studentList", studentList);
-          request.getRequestDispatcher("viewClassroom.jsp").forward(request, response);
+          request.getRequestDispatcher("viewClass.jsp").forward(request, response);
       } else {
-          response.sendRedirect("classroom.jsp?status=notfound");
+          response.sendRedirect("class.jsp?status=notfound");
       }
 	}
 

@@ -1,4 +1,4 @@
-<%@ page import="java.util.*, model.Classroom, model.User, dao.StudentDAO, dao.ClassroomDAO" %>
+<%@ page import="java.util.*, model.Classes, model.User, dao.StudentDAO, dao.ClassDAO" %>
 <%
   String email = (String) session.getAttribute("email");
   if (email == null) {
@@ -7,15 +7,15 @@
     return;
   }
 
-  List<Classroom> classroomList = ClassroomDAO.getAllClassrooms();
-  List<User> studentList = StudentDAO.getAllStudents();
+  List<Classes> classList = ClassDAO.getAllClasses();
+  List<User> studentList = StudentDAO.getStudentsWithoutClass();
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Classroom Management</title>
+  <title>Class Management</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -59,8 +59,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">
@@ -91,41 +91,47 @@
   <!-- CONTENT -->
   <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-	  <h2 class="mb-0">Classroom List</h2>
+	  <h2 class="mb-0">Class List</h2>
 	  <div>
-	  	<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassroomModal">
-		    <i class="bi bi-person-plus"></i> Add classroom
+	  	<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClassModal">
+		    <i class="bi bi-person-plus"></i> Add class
 		  </button>
-	  	<button id="deleteSelectedBtn" class="btn btn-danger me-2" disabled onclick="deleteSelectedClassrooms()">
-	      <i class="bi bi-trash"></i> Delete Classroom
+	  	<button id="deleteSelectedBtn" class="btn btn-danger me-2" disabled onclick="deleteSelectedClasses()">
+	      <i class="bi bi-trash"></i> Delete Class
 	    </button>
 	  </div>
 	</div>
 
-	<%
-	  List<String> undeletableClassrooms = (List<String>) session.getAttribute("undeletableClassrooms");
-	  if (undeletableClassrooms != null && !undeletableClassrooms.isEmpty()) {
+	<% String errorMessage = request.getParameter("add_error"); %>
+	<% if (errorMessage != null) { 
+	  	if (errorMessage.equals("class_name_already_exists")) {
 	%>
-	  <div class="alert alert-danger alert-dismissible fade show" role="alert">
-	    <strong>Warning!</strong> Cannot delete the following classrooms because there are students in classroom:
-	    <ul>
-	      <% for (String classroomName : undeletableClassrooms) { %>
-	        <li><%= classroomName %></li>
-	      <% } %>
-	    </ul>
-	    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-	  </div>
+	    <div style="color: red;">Class name already exists.</div>
+	<% } } %>
+
 	<%
-	    session.removeAttribute("undeletableClassrooms");
+	  List<String> undeletableClasses = (List<String>) session.getAttribute("undeletableClasses");
+	if (undeletableClasses != null) {
+	  %>
+	      <div class="alert alert-danger">
+	          <strong>Cannot delete the below classes:</strong>
+	          <ul>
+	          <% for (String message : undeletableClasses) { %>
+	              <li><%= message %></li>
+	          <% } %>
+	          </ul>
+	      </div>
+	  <%
+	      session.removeAttribute("undeletableClasses");
 	  }
 	%>
 
-    <% if (classroomList != null && !classroomList.isEmpty()) { %>
-    	<form id="deleteForm" action="DeleteClassroom" method="post">
+    <% if (classList != null && !classList.isEmpty()) { %>
+    	<form id="deleteForm" action="DeleteClass" method="post">
 	      <table class="table table-bordered table-striped">
 			  <thead class="table-dark">
 			    <tr>
-			      <th><input type="checkbox" id="selectAllCheckboxClassroom"></th>
+			      <th><input type="checkbox" id="selectAllCheckboxClass"></th>
 			      <th>NO</th>
 			      <th>Class Name</th>
 			      <th>Class Period</th>
@@ -136,22 +142,22 @@
 			  <tbody>
 			    <%
 			      int index = 1;
-			      for(Classroom cls : classroomList) {
+			      for(Classes cls : classList) {
 			    %>
 			      <tr>
-			        <td><input type="checkbox" class="classroomCheckbox" name="classroomIds" value="<%= cls.getID() %>"></td>
+			        <td><input type="checkbox" class="classCheckbox" name="classIds" value="<%= cls.getID() %>"></td>
 			        <td><%= index++ %></td>
 			        <td><%= cls.getClassName() %></td>
 			        <td><%= cls.getClassPeriod() %></td>
 			        <td><%= cls.getTeacherName() %></td>
 			        <td>
-			        	<a href="ViewClassroom?id=<%= cls.getID() %>" class="btn btn-info btn-sm">
+			        	<a href="ViewClass?id=<%= cls.getID() %>" class="btn btn-info btn-sm">
 						  <i class="bi bi-eye"></i>
 						</a>
-			        	<button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#assignStudentModal" data-classroom-id="<%= cls.getID() %>">
+			        	<button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#assignStudentModal" data-class-id="<%= cls.getID() %>">
 						  <i class="bi bi-person-plus"></i>
 						</button>
-			          <button class="btn btn-warning btn-sm" onclick="openEditModal('<%= cls.getID() %>', '<%= cls.getClassName() %>', '<%= cls.getClassPeriod() %>', '<%= cls.getTeacherName() %>')">
+			          <button type="button" class="btn btn-warning btn-sm" onclick="openEditModal('<%= cls.getID() %>', '<%= cls.getClassName() %>', '<%= cls.getClassPeriod() %>', '<%= cls.getTeacherName() %>')">
 			            <i class="bi bi-pencil"></i>
 			          </button>
 			        </td>
@@ -161,17 +167,17 @@
 			</table>
 		</form>
     <% } else { %>
-      <div class="alert alert-warning">No classrooms available.</div>
+      <div class="alert alert-warning">No classes available.</div>
     <% } %>
   </div>
   
-  <!-- Add Classroom Modal -->
-	<div class="modal fade" id="addClassroomModal" tabindex="-1" aria-labelledby="addClassroomModalLabel" aria-hidden="true">
+  <!-- Add Class Modal -->
+	<div class="modal fade" id="addClassModal" tabindex="-1" aria-labelledby="addClassModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
-	    <form action="<%= request.getContextPath() %>/AddClassroom" method="post">
+	    <form action="<%= request.getContextPath() %>/AddClass" method="post">
 	      <div class="modal-content">
 	        <div class="modal-header">
-	          <h5 class="modal-title" id="addClassroomModalLabel">Add New Classroom</h5>
+	          <h5 class="modal-title" id="addClassModalLabel">Add New Class</h5>
 	          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	        </div>
 	        <div class="modal-body">
@@ -185,11 +191,11 @@
 	          </div>
 	          <div class="mb-3">
 	            <label for="teacher" class="form-label">Teacher</label>
-	            <input type="text" class="form-control" id="teacher" name="teacher" required>
+	            <input type="text" class="form-control" id="teacher" name="teacher_name" required>
 	          </div>
 	        </div>
 	        <div class="modal-footer">
-	          <button type="submit" class="btn btn-success">Add Classroom</button>
+	          <button type="submit" class="btn btn-success">Add Class</button>
 	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	        </div>
 	      </div>
@@ -197,13 +203,13 @@
 	  </div>
 	</div>
 	
-	<!-- Update Classroom Modal -->
+	<!-- Update Class Modal -->
 	<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
 	  <div class="modal-dialog">
-	    <form action="UpdateClassroom" method="post">
+	    <form action="UpdateClass" method="post">
 	      <div class="modal-content">
 	        <div class="modal-header">
-	          <h5 class="modal-title" id="editModalLabel">Edit Classroom</h5>
+	          <h5 class="modal-title" id="editModalLabel">Edit Class</h5>
 	          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 	        </div>
 	        <div class="modal-body">
@@ -269,7 +275,7 @@
 	        </div>
 	
 	        <div class="modal-footer">
-	          <input type="hidden" name="classroomId" value="">
+	          <input type="hidden" name="classId" value="">
 	          <button type="submit" class="btn btn-primary">Assign Selected</button>
 	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	        </div>
@@ -330,33 +336,33 @@
 	  const assignModal = document.getElementById('assignStudentModal');
 	  assignModal.addEventListener('show.bs.modal', function (event) {
 	    const button = event.relatedTarget;
-	    const classroomId = button.getAttribute('data-classroom-id');
-	    const inputHidden = assignModal.querySelector('input[name="classroomId"]');
-	    inputHidden.value = classroomId;
+	    const classId = button.getAttribute('data-class-id');
+	    const inputHidden = assignModal.querySelector('input[name="classId"]');
+	    inputHidden.value = classId;
 	  });
 	</script>
 		
 	<script>
-	  const selectAllCheckboxClassroom = document.getElementById('selectAllCheckboxClassroom');
-	  const classroomCheckboxes = document.getElementsByClassName('classroomCheckbox');
+	  const selectAllCheckboxClass = document.getElementById('selectAllCheckboxClass');
+	  const classCheckboxes = document.getElementsByClassName('classCheckbox');
 	  const deleteSelectedBtn = document.getElementById('deleteSelectedBtn');
 	
 	  // Get "Select All" event
-	  selectAllCheckboxClassroom.addEventListener('change', function() {
-	    for (let checkbox of classroomCheckboxes) {
-	      checkbox.checked = selectAllCheckboxClassroom.checked;
+	  selectAllCheckboxClass.addEventListener('change', function() {
+	    for (let checkbox of classCheckboxes) {
+	      checkbox.checked = selectAllCheckboxClass.checked;
 	    }
 	    toggleDeleteButton();
 	  });
 	
 	  // Get each checkbox event
-	  for (let checkbox of classroomCheckboxes) {
+	  for (let checkbox of classCheckboxes) {
 		  checkbox.addEventListener('change', function() {
 		    if (!this.checked) {
-		      selectAllCheckboxClassroom.checked = false;
+		      selectAllCheckboxClass.checked = false;
 		    } else {
-		      const allChecked = Array.from(classroomCheckboxes).every(cb => cb.checked);
-		      selectAllCheckboxClassroom.checked = allChecked;
+		      const allChecked = Array.from(classCheckboxes).every(cb => cb.checked);
+		      selectAllCheckboxClass.checked = allChecked;
 		    }
 		    toggleDeleteButton();
 		  });
@@ -364,13 +370,13 @@
 
 	
 	  function toggleDeleteButton() {
-	    const anyChecked = Array.from(classroomCheckboxes).some(cb => cb.checked);
+	    const anyChecked = Array.from(classCheckboxes).some(cb => cb.checked);
 	    deleteSelectedBtn.disabled = !anyChecked;
 	  }
 	
 	  // Delete Selected
-	  function deleteSelectedClassrooms() {
-	    if (confirm('Are you sure you want to delete the selected classrooms?')) {
+	  function deleteSelectedClasses() {
+	    if (confirm('Are you sure you want to delete the selected classes?')) {
 	      document.getElementById('deleteForm').submit();
 	    }
 	  }

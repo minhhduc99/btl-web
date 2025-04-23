@@ -13,40 +13,40 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.Classroom;
+import model.Classes;
 
 /**
- * Servlet implementation class Classroom
+ * Servlet implementation class Classes
  */
-@WebServlet("/Classroom")
-public class ClassroomServlet extends HttpServlet {
+@WebServlet("/Classes")
+public class ClassServlet extends HttpServlet {
   /**
    * 
    */
   private static final long serialVersionUID = 1L;
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    List<Classroom> classroomList = new ArrayList<>();
+    List<Classes> classList = new ArrayList<>();
 
     try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_student_management", "dbadmin", "Abc@13579")) {
-      String sql = "SELECT * FROM classrooms";
+      String sql = "SELECT * FROM classes";
       PreparedStatement pst = conn.prepareStatement(sql);
       ResultSet rs = pst.executeQuery();
 
       while (rs.next()) {
-        Classroom cls = new Classroom();
+        Classes cls = new Classes();
         cls.setID(rs.getInt("id"));
         cls.setClassName(rs.getString("class_name"));
         cls.setClassPeriod(rs.getString("class_period"));
         cls.setTeacherName(rs.getString("teacher_name"));
-        classroomList.add(cls);
+        classList.add(cls);
       }
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    request.setAttribute("classroomList", classroomList);
-    request.getRequestDispatcher("classroom.jsp").forward(request, response);
+    request.setAttribute("classList", classList);
+    request.getRequestDispatcher("classes.jsp").forward(request, response);
   }
 }
 

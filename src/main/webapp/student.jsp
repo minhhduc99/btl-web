@@ -58,8 +58,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">
@@ -100,6 +100,13 @@
 	    </button>
 	  </div>
 	</div>
+
+	<% String errorMessage = request.getParameter("error"); %>
+	<% if (errorMessage != null) { 
+	  	if (errorMessage.equals("info_already_exists")) {
+	%>
+	    <div style="color: red;">Student ID or email already exists.</div>
+	<% } } %>
 
 	<%
 	  List<String> undeletableStudents = (List<String>) session.getAttribute("undeletableStudents");

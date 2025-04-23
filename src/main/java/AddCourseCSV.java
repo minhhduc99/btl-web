@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 
 /**
  * Servlet implementation class AddCourseCSV
@@ -48,11 +49,14 @@ public class AddCourseCSV extends HttpServlet {
 		// doGet(request, response);
 	  Connection con = null;
       PreparedStatement pst = null;
+      PreparedStatement checkPst = null;
       String sql = "INSERT INTO courses (course_code, course_name, description, credits) VALUES (?, ?, ?, ?)";
+      String checkSql = "SELECT * FROM courses WHERE course_code=? OR course_name=?";
 
       try {
           con = DBUtil.getConnection();
           pst = con.prepareStatement(sql);
+          checkPst = con.prepareStatement(checkSql);
 
           Part filePart = request.getPart("csv_file");
           InputStream inputStream = filePart.getInputStream();
@@ -67,17 +71,26 @@ public class AddCourseCSV extends HttpServlet {
                   String description = parts[2].trim();
                   int credits = Integer.parseInt(parts[3].trim());
 
-                  pst.setString(1, courseCode);
-                  pst.setString(2, courseName);
-                  pst.setString(3, description);
-                  pst.setInt(4, credits);
-                  pst.executeUpdate();
+                  checkPst.setString(1, courseCode);
+                  checkPst.setString(2, courseName);
+                  ResultSet rs = checkPst.executeQuery();
+                  
+                  if (!rs.next()) { 
+                    pst.setString(1, courseCode);
+                    pst.setString(2, courseName);
+                    pst.setString(3, description);
+                    pst.setInt(4, credits);
+                    pst.executeUpdate();
+                  }
+                  
+                  rs.close();
               }
           }
 
           reader.close();
           pst.close();
           con.close();
+          checkPst.close();
 
       } catch (Exception e) {
           e.printStackTrace();

@@ -42,34 +42,58 @@ public class DeleteCourse extends HttpServlet {
 		// doGet(request, response);
 	  String[] ids = request.getParameterValues("courseIds");
 
-      if (ids == null || ids.length == 0) {
-          response.sendRedirect("Course");
-          return;
-      }
+	    if (ids == null || ids.length == 0) {
+	        response.sendRedirect("Course");
+	        return;
+	    }
 
-      try (Connection conn = DBUtil.getConnection()) {
+	    try (Connection conn = DBUtil.getConnection()) {
+	        StringBuilder checkSql = new StringBuilder("SELECT COUNT(*) FROM schedules WHERE course_id IN (");
+	        for (int i = 0; i < ids.length; i++) {
+	            checkSql.append("?");
+	            if (i < ids.length - 1) {
+	                checkSql.append(",");
+	            }
+	        }
+	        checkSql.append(")");
 
-          StringBuilder sql = new StringBuilder("DELETE FROM courses WHERE id IN (");
-          for (int i = 0; i < ids.length; i++) {
-              sql.append("?");
-              if (i < ids.length - 1) {
-                  sql.append(",");
-              }
-          }
-          sql.append(")");
+	        PreparedStatement checkPst = conn.prepareStatement(checkSql.toString());
+	        for (int i = 0; i < ids.length; i++) {
+	            checkPst.setInt(i + 1, Integer.parseInt(ids[i]));
+	        }
 
-          PreparedStatement pst = conn.prepareStatement(sql.toString());
+	        var rs = checkPst.executeQuery();
+	        int count = 0;
+	        if (rs.next()) {
+	            count = rs.getInt(1);
+	        }
 
-          for (int i = 0; i < ids.length; i++) {
-              pst.setInt(i + 1, Integer.parseInt(ids[i]));
-          }
+	        if (count > 0) {
+	            response.sendRedirect("Course?error=course_in_use");
+	            return;
+	        }
 
-          pst.executeUpdate();
-      } catch (Exception e) {
-          e.printStackTrace();
-      }
+	        StringBuilder deleteSql = new StringBuilder("DELETE FROM courses WHERE id IN (");
+	        for (int i = 0; i < ids.length; i++) {
+	            deleteSql.append("?");
+	            if (i < ids.length - 1) {
+	                deleteSql.append(",");
+	            }
+	        }
+	        deleteSql.append(")");
 
-      response.sendRedirect("Course");
+	        PreparedStatement deletePst = conn.prepareStatement(deleteSql.toString());
+	        for (int i = 0; i < ids.length; i++) {
+	            deletePst.setInt(i + 1, Integer.parseInt(ids[i]));
+	        }
+
+	        deletePst.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+
+	    response.sendRedirect("Course");
 	}
 
 }

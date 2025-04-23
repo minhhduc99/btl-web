@@ -1,4 +1,4 @@
-<%@ page import="java.util.*, model.Classroom, model.User, dao.StudentDAO" %>
+<%@ page import="java.util.*, model.Classes, model.User, dao.StudentDAO" %>
 <%
   String email = (String) session.getAttribute("email");
   if (email == null) {
@@ -7,17 +7,17 @@
     return;
   }
 
-  // List<Classroom> classroomList = ClassroomDAO.getAllClassrooms();
+  // List<Classes> classList = ClassDAO.getAllClasss();
   List<User> allStudentList = StudentDAO.getAllStudents();
-  Classroom classroom = (Classroom) request.getAttribute("classroom");
-  List<User> studentInClassList = StudentDAO.getStudentsByClassroomId(classroom.getID());
+  Classes cls = (Classes) request.getAttribute("class");
+  List<User> studentInClassList = StudentDAO.getStudentsByClassId(cls.getID());
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Classroom Info</title>
+  <title>Class Info</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -61,8 +61,8 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="<%= request.getContextPath() %>/Classroom" aria-expanded="false">
-            Classroom
+          <a class="nav-link" href="<%= request.getContextPath() %>/Classes" aria-expanded="false">
+            Class
           </a>
         </li>
         <li class="nav-item">
@@ -106,7 +106,7 @@
 
 	<% if (studentInClassList != null && !studentInClassList.isEmpty()) { %>
 		<form id="deleteForm" action="RemoveStudentFromClass" method="post">
-			<input type="hidden" name="classroomId" value="<%= classroom.getID() %>">
+			<input type="hidden" name="classId" value="<%= cls.getID() %>">
 		    <table class="table table-bordered">
 			  <thead>
 			    <tr>
@@ -178,7 +178,7 @@
 	        </div>
 	
 	        <div class="modal-footer">
-	          <input type="hidden" name="classroomId" value="<%= classroom.getID() %>">
+	          <input type="hidden" name="classId" value="<%= cls.getID() %>">
 	          <button type="submit" class="btn btn-primary">Add Selected</button>
 	          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 	        </div>
@@ -227,9 +227,9 @@
 	  const addModal = document.getElementById('addStudentModal');
 	  addModal.addEventListener('show.bs.modal', function (event) {
 	    const button = event.relatedTarget;
-	    const classroomId = button.getAttribute('data-classroom-id');
-	    const inputHidden = assignModal.querySelector('input[name="classroomId"]');
-	    inputHidden.value = classroomId;
+	    const classId = button.getAttribute('data-class-id');
+	    const inputHidden = assignModal.querySelector('input[name="classId"]');
+	    inputHidden.value = classId;
 	  });
 	</script>
 	

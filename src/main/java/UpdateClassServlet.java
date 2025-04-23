@@ -11,16 +11,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 
 /**
- * Servlet implementation class UpdateClassroomServlet
+ * Servlet implementation class UpdateClassServlet
  */
-@WebServlet("/UpdateClassroom")
-public class UpdateClassroomServlet extends HttpServlet {
+@WebServlet("/UpdateClass")
+public class UpdateClassServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public UpdateClassroomServlet() {
+    public UpdateClassServlet() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -46,7 +46,7 @@ public class UpdateClassroomServlet extends HttpServlet {
 
 	    try {
 	      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/java_student_management", "dbadmin", "Abc@13579");
-	      PreparedStatement ps = con.prepareStatement("UPDATE classrooms SET class_name=?, class_period=?, teacher_name=? WHERE id=?");
+	      PreparedStatement ps = con.prepareStatement("UPDATE classes SET class_name=?, class_period=?, teacher_name=? WHERE id=?");
 	      ps.setString(1, className);
 	      ps.setString(2, classPeriod);
 	      ps.setString(3, teacherName);
@@ -55,7 +55,7 @@ public class UpdateClassroomServlet extends HttpServlet {
 	    } catch (Exception e) {
 	      e.printStackTrace();
 	    }
-	    response.sendRedirect("Classroom");
+	    response.sendRedirect("Classes");
 	}
 
 }

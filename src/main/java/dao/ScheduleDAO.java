@@ -1,6 +1,6 @@
 package dao;
 
-import model.Classroom;
+import model.Classes;
 import model.Schedule;
 import utils.DBUtil;
 
@@ -14,7 +14,7 @@ public class ScheduleDAO {
         List<Schedule> list = new ArrayList<>();
         String sql = "SELECT sc.id, cl.id AS classId, cs.id AS courseId, sc.teacher_name, sc.room, sc.day_of_week, sc.start_time, sc.end_time " +
                      "FROM schedules sc " +
-                     "JOIN classrooms cl ON sc.class_id = cl.id " +
+                     "JOIN classes cl ON sc.class_id = cl.id " +
                      "JOIN courses cs ON sc.course_id = cs.id ";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
