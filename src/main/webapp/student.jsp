@@ -72,6 +72,11 @@
           	Schedule
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" href="<%= request.getContextPath() %>/Score/Input" aria-expanded="false">
+          	Score
+          </a>
+        </li>
       </ul>
       <ul class="navbar-nav mb-2 mb-lg-0">
         <li class="nav-item me-3">
@@ -150,6 +155,9 @@
 	            <td><%= u.getFullName() %></td>
 	            <td><%= u.getEmail() %></td>
 	            <td>
+	              <a href="ViewStudent?id=<%= u.getID() %>" class="btn btn-info btn-sm">
+					  <i class="bi bi-eye"></i>
+					</a>
 		          <button type="button" class="btn btn-warning btn-sm" onclick="openEditModal('<%= u.getID() %>', '<%= u.getStudentID() %>', '<%= u.getFullName() %>', '<%= u.getEmail() %>')">
 		            <i class="bi bi-pencil"></i>
 		          </button>

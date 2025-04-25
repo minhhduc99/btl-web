@@ -114,4 +114,27 @@ public class ClassDAO {
 
       return class_name;
     }
+    
+    public static Classes getClassByStudentId(String studentId) {
+      Classes result = null;
+      try {
+        Connection conn = DBUtil.getConnection();
+        String sql = "SELECT c.id, c.class_name " +
+                     "FROM classes c " +
+                     "JOIN student_classes sc ON c.id = sc.class_id " +
+                     "WHERE sc.student_id = ?";
+        PreparedStatement ps = conn.prepareStatement(sql);
+        ps.setString(1, studentId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            result = new Classes();
+            result.setID(rs.getInt("id"));
+            result.setClassName(rs.getString("class_name"));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return result;
+  }
+
 }
