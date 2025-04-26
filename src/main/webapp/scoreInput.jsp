@@ -173,7 +173,7 @@
 			       Score score = ScoreDAO.getScoreByStudentAndCourse(Integer.parseInt(s.getID()), courseId);
 			  %>
 			  <tr>
-			    <td><%= s.getID() %></td>
+			    <td><%= s.getStudentID() %></td>
 			    <td><%= s.getFullName() %></td>
 			    <td>
 			      <% if (isEditing) { %>

@@ -58,7 +58,7 @@ public class ViewClass extends HttpServlet {
           try {
             studentList = StudentDAO.getStudentsByClassId(classId);
             courses = CourseDAO.getCoursesByClassId(classId);
-            scoreMap = (Map<String, Double>) ScoreDAO.getScoresByClass(classId); // key: studentId-courseId
+            scoreMap = ScoreDAO.getScoresByClass(classId);
           } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

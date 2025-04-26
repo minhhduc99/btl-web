@@ -58,7 +58,7 @@ public class CourseDAO {
       List<Course> courses = new ArrayList<>();
       Connection conn = DBUtil.getConnection();
       try {
-          String sql = "SELECT c.id, c.course_code, c.course_name FROM courses c " +
+          String sql = "SELECT DISTINCT c.id, c.course_code, c.course_name FROM courses c " +
                        "JOIN schedules s ON c.id = s.course_id " +
                        "WHERE s.class_id = ?";
           PreparedStatement ps = conn.prepareStatement(sql);
@@ -76,6 +76,7 @@ public class CourseDAO {
       }
       return courses;
   }
+
 
     public static List<Course> getCoursesByStudentId(String studentId) throws Exception {
       List<Course> courseList = new ArrayList<>();

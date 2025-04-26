@@ -81,31 +81,34 @@ public class ScoreDAO {
         return list;
     }
     
-    public static List<Score> getScoresByClass(int classId) throws Exception {
-      List<Score> list = new ArrayList<>();
+    public static Map<String, Double> getScoresByClass(int classId) throws Exception {
+      Map<String, Double> scoreMap = new HashMap<>();
       Connection conn = DBUtil.getConnection();
       try {
-          String sql = "SELECT s.id, s.student_id, s.course_id, s.score " +
+          String sql = "SELECT s.student_id, s.course_id, s.score " +
                        "FROM scores s " +
-                       "JOIN students st ON s.student_id = st.id " +
-                       "WHERE st.class_id = ?";
+                       "JOIN student_classes sc ON s.student_id = sc.student_id " +
+                       "WHERE sc.class_id = ?";
           PreparedStatement ps = conn.prepareStatement(sql);
           ps.setInt(1, classId);
           ResultSet rs = ps.executeQuery();
           while (rs.next()) {
-              Score score = new Score(
-                  rs.getInt("id"),
-                  rs.getInt("student_id"),
-                  rs.getInt("course_id"),
-                  rs.getDouble("score")
-              );
-              list.add(score);
+              int studentId = rs.getInt("student_id");
+              int courseId = rs.getInt("course_id");
+              double score = rs.getDouble("score");
+
+              // key = "studentId_courseId"
+              String key = studentId + "_" + courseId;
+              scoreMap.put(key, score);
           }
       } catch (Exception e) {
           e.printStackTrace();
+      } finally {
+          if (conn != null) conn.close();
       }
-      return list;
+      return scoreMap;
   }
+
 
     public static void updateOrInsertScore(int studentId, int courseId, int classId, float score) {
     try (Connection conn = DBUtil.getConnection()) {

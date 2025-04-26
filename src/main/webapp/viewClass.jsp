@@ -8,7 +8,7 @@
   }
 
   // List<Classes> classList = ClassDAO.getAllClasss();
-  List<User> allStudentList = StudentDAO.getAllStudents();
+  List<User> studentList = StudentDAO.getStudentsWithoutClass();
   Classes cls = (Classes) request.getAttribute("class");
   List<User> studentInClassList = StudentDAO.getStudentsByClassId(cls.getID());
 %>
@@ -170,7 +170,7 @@
 	              </tr>
 	            </thead>
 	            <tbody id="studentTableBody">
-	              <% for (User u : allStudentList) { %>
+	              <% for (User u : studentList) { %>
 	                <tr>
 	                  <td><input type="checkbox" class="student-checkbox" name="selectedStudents" value="<%= u.getID() %>"></td>
 	                  <td class="student-id"><%= u.getStudentID() %></td>
